@@ -138,7 +138,7 @@ class MaestroGoHome(MaestroPacket):
     _COMMAND_BYTE = 0x22
 
     def _compile(self):
-        return struct.pack('B', 0x22)
+        return chr(0x22)
 
     def __repr__(self):
         return "MaestroGoHome()"
