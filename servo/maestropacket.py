@@ -89,6 +89,15 @@ class MaestroSetTarget(MaestroChannelSetPacket):
         field = getattr(self, self._COMMAND_FIELD)
         return field * self.__QUARTER_US_MULTIPLIER
 
+class MaestroSetSpeed(MaestroChannelSetPacket):
+    _CLASS_NAME = 'MaestroSetSpeed'
+    _COMMAND_BYTE = 0x07
+    _COMMAND_FIELD = 'speed'
+
+    def __init__(self, channel, acceleration):
+        super(MaestroSetSpeed, self).__init__(channel=channel,
+                                              speed=speed)
+
 class MaestroSetAcceleration(MaestroChannelSetPacket):
     _CLASS_NAME = 'MaestroSetAcceleration'
     _COMMAND_BYTE  = 0x09
@@ -109,7 +118,7 @@ class MaestroGetPosition(MaestroChannelGetPacket):
         # We expect a 2-byte respone:
         lsb, = struct.unpack('B', channel.receive())
         msb, = struct.unpack('B', channel.receive())
-        position = (msb << 8) + lsb
+        position = ((msb << 8) + lsb) / 4
         logging.debug("Got position {0} from channel {1}".format(
             position, self.channel))
         return position
