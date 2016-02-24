@@ -44,6 +44,11 @@ class MaestroChannelSetPacket(MaestroChannelPacket):
             self._prepare_field() & 0x7f,
             (self._prepare_field() >> 7) & 0x7f)
 
+    def _prepare_field(self):
+        """A default implementation, inheriting classes with special cases
+        should re-implement this method."""
+        return getattr(self, self._COMMAND_FIELD)
+
     def __repr__(self):
         return "{0}(channel={1}, {2}={3})".format(
             self._CLASS_NAME, self.channel,
@@ -78,7 +83,7 @@ class MaestroChannelGetPacket(MaestroChannelPacket):
 
 class MaestroSetTarget(MaestroChannelSetPacket):
     _CLASS_NAME = 'MaestroSetTarget'
-    _COMMAND_BYTE  = 0x04
+    _COMMAND_BYTE = 0x04
     _COMMAND_FIELD = 'target'
     __QUARTER_US_MULTIPLIER = 4
 
@@ -94,13 +99,13 @@ class MaestroSetSpeed(MaestroChannelSetPacket):
     _COMMAND_BYTE = 0x07
     _COMMAND_FIELD = 'speed'
 
-    def __init__(self, channel, acceleration):
+    def __init__(self, channel, speed):
         super(MaestroSetSpeed, self).__init__(channel=channel,
                                               speed=speed)
 
 class MaestroSetAcceleration(MaestroChannelSetPacket):
     _CLASS_NAME = 'MaestroSetAcceleration'
-    _COMMAND_BYTE  = 0x09
+    _COMMAND_BYTE = 0x09
     _COMMAND_FIELD = 'acceleration'
 
     def __init__(self, channel, acceleration):
