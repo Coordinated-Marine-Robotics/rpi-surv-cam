@@ -6,21 +6,25 @@ import logging
 
 import maestropacket
 
-logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+logger = logging.getLogger("servoLogger")
 
 class MaestroConnection(object):
     def __init__(self):
-        logging.info("New MaestroConnection created")
+        logger.info("New MaestroConnection created")
         self._connection = None
 
     def __del__(self):
         if not self._connection.closed:
             self.close()
 
-    # TODO: add enter and exit
+    def __enter__(self):
+        pass
+
+    def __exit__(self, *exc_info):
+        self.close()
 
     def close(self):
-        logging.info("MaestroConnection closed")
+        logger.info("MaestroConnection closed")
         self._connection.close()
 
     def send(self, command):
@@ -30,7 +34,8 @@ class MaestroConnection(object):
                 "'MaestroPacket' but is of type {0}".format(
                     type(command)))
 
-        logging.info("Sending command {0}".format(repr(command)))
+        logger.debug("Sending command {0}: {1}".format(
+            repr(command), repr(str(command))))
 
         # All commands write something to the Maestro:
         self._connection.write(str(command))

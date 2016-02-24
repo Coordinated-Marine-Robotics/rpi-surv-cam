@@ -4,6 +4,8 @@ import struct
 import logging
 from analogpacket import AnalogPacket
 
+logger = logging.getLogger("servoLogger")
+
 class MaestroPacket(AnalogPacket):
     _HEADER = struct.pack('BB', 0xaa, 0x0c)
 
@@ -32,9 +34,11 @@ class MaestroChannelSetPacket(MaestroChannelPacket):
     # - 3rd byte is for the command value LSB
     # - 4th byte is for the command value MSB
     _COMMAND_FORMAT = '4B'
+    __QUARTER_US_MULTIPLIER = 4
 
     def __init__(self, channel, **kwargs):
-        super(MaestroChannelSetPacket, self).__init__(channel=channel, **kwargs)
+        super(MaestroChannelSetPacket, self).__init__(
+            channel=channel, **kwargs)
 
     def _compile(self):
         return struct.pack(
@@ -45,9 +49,8 @@ class MaestroChannelSetPacket(MaestroChannelPacket):
             (self._prepare_field() >> 7) & 0x7f)
 
     def _prepare_field(self):
-        """A default implementation, inheriting classes with special cases
-        should re-implement this method."""
-        return getattr(self, self._COMMAND_FIELD)
+        field = getattr(self, self._COMMAND_FIELD)
+        return field * self.__QUARTER_US_MULTIPLIER
 
     def __repr__(self):
         return "{0}(channel={1}, {2}={3})".format(
@@ -85,14 +88,9 @@ class MaestroSetTarget(MaestroChannelSetPacket):
     _CLASS_NAME = 'MaestroSetTarget'
     _COMMAND_BYTE = 0x04
     _COMMAND_FIELD = 'target'
-    __QUARTER_US_MULTIPLIER = 4
 
     def __init__(self, channel, target):
         super(MaestroSetTarget, self).__init__(channel=channel, target=target)
-
-    def _prepare_field(self):
-        field = getattr(self, self._COMMAND_FIELD)
-        return field * self.__QUARTER_US_MULTIPLIER
 
 class MaestroSetSpeed(MaestroChannelSetPacket):
     _CLASS_NAME = 'MaestroSetSpeed'
@@ -124,9 +122,26 @@ class MaestroGetPosition(MaestroChannelGetPacket):
         lsb, = struct.unpack('B', channel.receive())
         msb, = struct.unpack('B', channel.receive())
         position = ((msb << 8) + lsb) / 4
-        logging.debug("Got position {0} from channel {1}".format(
+        logger.debug("Got position {0} from channel {1}".format(
             position, self.channel))
         return position
+
+################################
+#### Maestro Go Home Packet ####
+################################
+# Maestro protocol packet which sends all servos and outputs to their home
+# positions.
+
+class MaestroGoHome(MaestroPacket):
+    _CLASS_NAME = 'MaestroGoHome'
+    # Just for documentation:
+    _COMMAND_BYTE = 0x22
+
+    def _compile(self):
+        return struct.pack('B', 0x22)
+
+    def __repr__(self):
+        return "MaestroGoHome()"
 
 ################################
 #### Maestro Script Packets ####
@@ -181,7 +196,6 @@ class MaestroRunScriptSubroutineWithParam(MaestroRunScriptSubroutine):
             self._CLASS_NAME,
             'sub_number', self.sub_number,
             'param', self.param)
-
 
 class MaestroStopScriptSubroutine(MaestroScriptPacket):
     _CLASS_NAME = 'MaestroStopScriptSubroutine'
