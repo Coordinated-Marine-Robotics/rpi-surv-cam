@@ -16,7 +16,8 @@ def check_value_range(value, value_range):
 _MaestroConnectionConfig = namedtuple(
     "MaestroConnectionConfig",
     ("connection_type", "baud_rate", "pan_channel", "tilt_channel",
-     "pan_step_degree", "tilt_step_degree", "servo_min", "servo_max"))
+     "pan_step_degree", "tilt_step_degree", "pan_servo_min", "pan_servo_max",
+     "tilt_servo_min", "tilt_servo_max",))
 
 class MaestroConnectionConfig(_MaestroConnectionConfig):
     _CONNECTION_TYPES = ('USB', 'UART')
@@ -25,7 +26,8 @@ class MaestroConnectionConfig(_MaestroConnectionConfig):
     def __init__(self, connection_type, baud_rate,
                  pan_channel, tilt_channel,
                  pan_step_degree, tilt_step_degree,
-                 servo_min, servo_max):
+                 pan_servo_min, pan_servo_max,
+                 tilt_servo_min, tilt_servo_max):
         super(MaestroConnectionConfig, self).__init__(
             check_value_range(connection_type, self._CONNECTION_TYPES),
             baud_rate,
@@ -33,10 +35,10 @@ class MaestroConnectionConfig(_MaestroConnectionConfig):
             check_value_range(tilt_channel, self._CHANNELS),
             pan_step_degree,
             tilt_step_degree,
-            servo_min,
-            servo_max)
-            #check_value_range(pan_step_degree, self._DEGREES),
-            #check_value_range(tilt_step_degree, self._DEGREES)
+            pan_servo_min,
+            pan_servo_max,
+            tilt_servo_min,
+            tilt_servo_max)
 
     @classmethod
     def from_file(cls, filename):
@@ -49,8 +51,11 @@ class MaestroConnectionConfig(_MaestroConnectionConfig):
                 file_dict['tilt_channel'],
                 file_dict['pan_step_degree'],
                 file_dict['pan_step_degree'],
-                file_dict['servo_min'],
-                file_dict['servo_max'],
+                file_dict['pan_servo_min'],
+                file_dict['pan_servo_max'],
+                file_dict['tilt_servo_min'],
+                file_dict['tilt_servo_max'],
+
             )
 
     def to_file(self, filename):
@@ -62,8 +67,10 @@ class MaestroConnectionConfig(_MaestroConnectionConfig):
                 'tilt_channel': self.tilt_channel,
                 'pan_step_degree': self.pan_step_degree,
                 'tilt_step_degree': self.tilt_step_degree,
-                'servo_min': self.servo_min,
-                'servo_max': self.servo_max,
+                'pan_servo_min': self.pan_servo_min,
+                'pan_servo_max': self.pan_servo_max,
+                'tilt_servo_min': self.tilt_servo_min,
+                'tilt_servo_max': self.tilt_servo_max,
             }
 
             f.write(str(file_dict))
