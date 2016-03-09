@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Raspberry Pi Camera Stream</title>
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" media="screen">  
+    <link href="font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="survcam.css" rel="stylesheet" type="text/css">
+  </head><body>
+    <div class="navbar navbar-default navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-ex-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#"><span>Survaillance Camera</span></a>
+        </div>
+        <div class="collapse navbar-collapse" id="navbar-ex-collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="active">
+              <a href="#">Home</a>
+            </li>
+            <li>
+              <a href="#">Settings</a>
+            </li>
+            <li>
+              <a href="#">Login</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <script src="{% static 'js/jquery-2.2.0.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <div class="section">
+      <div class="container">
+        <div class="row ">
+          <div class="col-md-2">
+            <div class="btn-group btn-group-vertical">
+              <a href="#" class="btn btn-default">Live Stream</a>
+              <a href="#" class="btn btn-default">Last 5 min.</a>
+              <a href="#" class="btn btn-default">Saved Snapshots<br></a>
+              <a class="btn btn-default">Scheduled Tasks<br></a>
+            </div>
+          </div>
+          <div class="col-md-10">
+            <div class="container-fluid">
+            {% block body_block %}{% endblock body_block %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+
+</body></html>

@@ -1,0 +1,60 @@
+{% extends "survcam/base.html" %}
+{% load static %}
+{% block body_block %}
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="well">
+      <img src="{{ camera.stream_url }}" class="img-responsive">
+    </div>
+  </div>
+  <div class="col-md-4">
+    <h3>Camera Details</h3>
+    <ul class="list-group">
+      <li class="list-group-item list-group-item-success">
+        <strong>Status:&nbsp;</strong>Live</li>
+      <li class="list-group-item">
+        <strong>Name:&nbsp;</strong>RPi Cam 1</li>
+      <li class="list-group-item">
+        <strong>Location:&nbsp;</strong>NSSL Lab 137</li>
+      <li class="list-group-item">
+        <strong>Resolution:&nbsp;</strong>1024x768</li>
+      <li class="list-group-item">
+        <strong>Frame rate:&nbsp;</strong>30 fps</li>
+      <li class="list-group-item">
+        <strong>Uptime:&nbsp;</strong>12 days, 3 hours</li>
+      <li class="list-group-item">
+        <strong>Last snapshot:&nbsp;</strong>21/04/16 14:32</li>
+    </ul>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <hr>
+    <h2>Last Events</h2>
+    <ul class="media-list">
+      <li class="media">
+        <a class="pull-left" href="#"><img class="media-object" src="http://pingendo.github.io/pingendo-bootstrap/assets/placeholder.png" height="48" width="48"></a>
+        <div class="media-body">
+          <h4 class="media-heading">
+            <small>21/04/16 14:32&nbsp;&nbsp;</small>Motion detected in NSSL Lab 317</h4>
+          <p>5 snapshots taken -
+            <a>view snapshots</a>
+          </p>
+        </div>
+      </li>
+      <li class="media">
+        <a class="pull-left" href="#"><img class="media-object" src="http://pingendo.github.io/pingendo-bootstrap/assets/placeholder.png" height="48" width="48"></a>
+        <div class="media-body">
+          <h4 class="media-heading">
+            <small>&nbsp;20/04/16 09:23&nbsp;&nbsp;</small>Scheduled task triggered</h4>
+          <p>10 seconds video saved -
+            <a>view video</a>
+          </p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+{% endblock %}
