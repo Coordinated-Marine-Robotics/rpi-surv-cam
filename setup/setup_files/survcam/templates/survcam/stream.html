@@ -1,0 +1,29 @@
+{% extends "survcam/base.html" %}
+{% load static %}
+{% block body_block %}
+	
+<div class="row margin-row text-center">
+	<img src="{{ camera.stream_url }}"/>
+</div>
+<div class="row margin-row text-center">
+	<div class="btn-group btn-group-lg" role="group">
+		<button id="move_left" class="btn btn-default" aria-label="Move Left">
+			<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+		</button>
+		
+                <button id="move_right" class="btn btn-default" aria-label="Move Right">
+                        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                </button>
+	</div>
+</div>
+<div class="row margin-row text-center">
+	<div class="col-md-4"></div>
+        <div class="col-md-4">
+		<div id="last-action" class="alert alert-success" role="alert"></div>
+	</div>
+        <div class="col-md-4"></div>
+</div>
+
+<script type="text/javascript" src="{% static 'js/movecamera.js' %}"></script>
+
+{% endblock %}
