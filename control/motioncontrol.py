@@ -69,6 +69,10 @@ class CameraMotionControl(object):
     def __to_degrees(self, steps, axis):
         return steps / self._one_degree_steps[axis]
 
+    def __degree_to_target(self, degree, axis):
+        return (self._start_positions[axis] +
+                degree * self._one_degree_steps[axis])
+
     def __get_relative_position(self, position, axis):
         return position - self._start_positions[axis]
 
@@ -119,6 +123,9 @@ class CameraMotionControl(object):
             self._degrees[axis] = self.__to_degrees_relative(
                 self._positions[axis], axis)
 
+    def move_to_degree(self, axis, degree):
+        self.__set_and_get_position(
+            axis, self.__degree_to_target(degree, axis))
 
     def pan_left(self):
         self.move('pan', self._config.pan_step_degree,
