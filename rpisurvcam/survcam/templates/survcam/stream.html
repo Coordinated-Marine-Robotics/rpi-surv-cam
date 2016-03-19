@@ -2,30 +2,39 @@
 {% load static %}
 {% block body_block %}
 
-<div class="row">
-  <div class="col-md-8">
+<div class="row-fluid">
+  <div class="col-md-6">
     <div class="well">
-      <img src="{{ camera.stream_url }}" class="img-responsive">
+      <img id="stream-img" src="{{ stream_url }}" class="img-responsive">
     </div>
+  </div>
+  <div class="col-md-2">
+      <input id="ex1" data-slider-id='ex1Slider' type="text" data-slider-min="-90" data-slider-max="90" data-slider-step="1" data-slider-value="0"
+             data-slider-orientation="vertical"/>
   </div>
   <div class="col-md-4">
     <h3>Camera Details</h3>
     <ul class="list-group">
-      <li class="list-group-item list-group-item-success">
+      <li id="stream-status" class="list-group-item list-group-item-success">
         <strong>Status:&nbsp;</strong>Live</li>
       <li class="list-group-item">
-        <strong>Name:&nbsp;</strong>RPi Cam 1</li>
+        <strong>Name:&nbsp;</strong>{{ camera.name }}</li>
       <li class="list-group-item">
-        <strong>Location:&nbsp;</strong>NSSL Lab 137</li>
+        <strong>Location:&nbsp;</strong>{{ camera.location }}</li>
       <li class="list-group-item">
-        <strong>Resolution:&nbsp;</strong>1024x768</li>
+        <strong>Resolution:&nbsp;</strong>{{ camera.resolution }}</li>
       <li class="list-group-item">
-        <strong>Frame rate:&nbsp;</strong>30 fps</li>
+        <strong>Frame rate:&nbsp;</strong>{{ camera.fps }} fps</li>
       <li class="list-group-item">
         <strong>Uptime:&nbsp;</strong>12 days, 3 hours</li>
       <li class="list-group-item">
         <strong>Last snapshot:&nbsp;</strong>21/04/16 14:32</li>
     </ul>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6 text-center">
+    <input id="ex2" data-slider-id='ex2Slider' type="text" data-slider-min="-90" data-slider-max="90" data-slider-step="1" data-slider-value="0"/>
   </div>
 </div>
 <div class="row">
