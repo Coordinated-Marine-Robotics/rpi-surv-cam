@@ -5,12 +5,11 @@
 <div class="row-fluid">
   <div class="col-md-6">
     <div class="well">
-      <img id="stream-img" src="{{ stream_url }}" class="img-responsive">
+      <img src="{% static 'house-03.jpg' %}" class="img-responsive">
     </div>
   </div>
   <div class="col-md-2">
-    <input id="ex1" data-slider-id='ex1Slider' type="text" data-slider-min="-90" data-slider-max="90" data-slider-step="1" data-slider-value="0"
-             data-slider-orientation="vertical" />
+      <input id="ex1" data-slider-id='ex1Slider' type="text" data-slider-min="-90" data-slider-max="90" data-slider-step="1" data-slider-value="0" data-slider-orientation="vertical"/>
   </div>
   <div class="col-md-4">
     <h3>Camera Details</h3>
@@ -50,33 +49,17 @@
     </div>
   </div>
 </div>
+<hr>
 <div class="row">
   <div class="col-md-12">
-    <hr>
-    <h2>Last Events</h2>
-    <ul class="media-list">
-      <li class="media">
-        <a class="pull-left" href="#"><img class="media-object" src="http://pingendo.github.io/pingendo-bootstrap/assets/placeholder.png" height="48" width="48"></a>
-        <div class="media-body">
-          <h4 class="media-heading">
-            <small>21/04/16 14:32&nbsp;&nbsp;</small>Motion detected in NSSL Lab 317</h4>
-          <p>5 snapshots taken -
-            <a>view snapshots</a>
-          </p>
-        </div>
-      </li>
-      <li class="media">
-        <a class="pull-left" href="#"><img class="media-object" src="http://pingendo.github.io/pingendo-bootstrap/assets/placeholder.png" height="48" width="48"></a>
-        <div class="media-body">
-          <h4 class="media-heading">
-            <small>&nbsp;20/04/16 09:23&nbsp;&nbsp;</small>Scheduled task triggered</h4>
-          <p>10 seconds video saved -
-            <a>view video</a>
-          </p>
-        </div>
-      </li>
-    </ul>
+    {% include "survcam/last_events.html" %}
   </div>
 </div>
-
+<div class="row">
+  <div class="col-md-5"></div>
+  <div class="col-md-2">
+    <a href="events">Show all events...</a>
+  </div>
+  <div class="col-md-5"></div>
+</div>
 {% endblock %}

@@ -1,0 +1,26 @@
+{% extends "survcam/base.html" %}
+{% load static %}
+{% block body_block %}
+<h2>All Events</h2>
+<ul class="media-list">
+    {% for event in events %}
+  <li class="media">
+ <a class="pull-left" href="#"><img class="media-object" src="http://pingendo.github.io/pingendo-bootstrap/assets/placeholder.png" height="48" width="48"></a>
+    <div class="media-body">
+      <h4 class="media-heading">
+        <small>{{ event.time }}&nbsp;&nbsp;</small>{{ event.description }}
+        <small>
+          {% if event.status == 0 %}
+          <span class="label label-success">&nbsp;&nbsp;Success
+            {% elif event.status == 2 %}
+            <span class="label label-danger">&nbsp;&nbsp;System Error
+              {% elif event.status == 3 %}
+              <span class="label label-info">&nbsp;&nbsp;Info
+                {% endif %}
+        &nbsp;&nbsp;</span></small>
+      </h4>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}
