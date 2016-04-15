@@ -1,4 +1,4 @@
-{% extends "survcam/base.html" %}
+{% extends "base.html" %}
 {% load static %}
 {% block body_block %}
 
@@ -52,13 +52,13 @@
 <hr>
 <div class="row">
   <div class="col-md-12">
-    {% include "survcam/last_events.html" %}
+    {% include "events/last_events.html" %}
   </div>
 </div>
 <div class="row">
   <div class="col-md-5"></div>
   <div class="col-md-2">
-    <a href="events">Show all events...</a>
+    <a href="/events">Show all events...</a>
   </div>
   <div class="col-md-5"></div>
 </div>

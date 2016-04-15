@@ -1,7 +1,7 @@
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse
 from survcam.models import Camera
-from events.models import Event, EventClass
+from events.models import Event, EventClass, get_recent_events
 import pika
 import socket
 import urllib2
@@ -15,25 +15,12 @@ def get_motion_stream_url(request):
 def get_motion_snapshot_url(request):
     return request.build_absolute_uri('/')[:-1] + ':8082/0/action/snapshot'
 
-def get_recent_events():
-    return Event.objects.order_by('-id')[:2]
-
-def get_all_events():
-    return Event.objects.order_by('-id')
-
 def index(request):
     return render_to_response(
             'survcam/stream.html',
             {'camera': Camera.objects.first(),
              'stream_url': get_motion_stream_url(request),
              'events': get_recent_events()})
-
-#@Event.register('admin', "get_all_events called",
-#                "System", Event.EVENT_INFO)
-def events(request):
-    return render_to_response(
-            'survcam/events.html',
-            {'events': get_all_events()})
 
 def move(request):
     # TODO: do connection to queue only once!

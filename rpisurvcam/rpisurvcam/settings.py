@@ -40,10 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'gunicorn',
     'survcam',
+    'events',
 ]
 
 SOCKETIO_HOST = '127.0.0.1'
-SOCKETIO_PORT = 9999 
+SOCKETIO_PORT = 9999
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
@@ -61,7 +62,7 @@ ROOT_URLCONF = 'rpisurvcam.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -83,7 +84,7 @@ WSGI_APPLICATION = 'rpisurvcam.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME':  '/home/pi/rpisurvcam/rpisurvcam.db',
+        'NAME':  '/home/amito/project/rpi-surv-cam/rpisurvcam/rpisurvcam.db',
     }
 }
 
@@ -125,10 +126,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATICFILES_DIRS = (
-	'/var/www/static/',
+    '/home/amito/project/rpi-surv-cam/setup/setup_files/static/',
+    #'/home/amito/project/rpi-surv-cam/rpisurvcam/survcam/templates/survcam/',
 )
 
 STATIC_URL = '/static/'
 MEDIA_ROOT = '/var/www/media/'
 MEDIA_URL = '/media/'
-STATIC_ROOT = '/var/www/'
+STATIC_ROOT = '/home/amito/project/rpi-surv-cam/setup/setup_files/'
