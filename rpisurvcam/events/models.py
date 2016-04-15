@@ -39,10 +39,6 @@ class Event(models.Model):
         related_name="events")
     status = models.PositiveSmallIntegerField(
         choices=EVENT_STATUSES_CHOICES, default=EVENT_SUCCESS)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="events")
     time = models.DateTimeField(
         auto_now=False,
         auto_now_add=True)
@@ -52,7 +48,6 @@ class Event(models.Model):
     class register(object):
         def __init__(self, user, description, event_class, status,
                      url=None, url_text=None):
-            self._user = User.objects.get(username=user)
             self._description = description
             self._event_class = EventClass.objects.get(name=event_class)
             self._status = status
@@ -62,14 +57,13 @@ class Event(models.Model):
         def __call__(self, func):
             def f(*args, **kwargs):
                 Event.objects.create(
-                    user=self._user,
                     description=self._description,
                     event_class=self._event_class,
                     status=self._status[0],
                     url=self._url,
                     url_text=self._url_text)
                 return func(*args, **kwargs)
-                # This is instead of @wraps:
+            # This is instead of @wraps:
             f.func_name = func.func_name
             f.__doc__ = func.__doc__
             return f
