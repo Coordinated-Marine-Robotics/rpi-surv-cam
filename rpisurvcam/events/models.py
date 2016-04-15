@@ -26,11 +26,13 @@ class Event(models.Model):
     EVENT_FAILURE = (1, 'Failure')
     EVENT_SYSTEM_ERROR = (2, 'System Error')
     EVENT_INFO = (3, 'Info')
+    EVENT_WARNING = (4, 'Warning')
     EVENT_STATUSES_CHOICES = (
         EVENT_SUCCESS,
         EVENT_FAILURE,
         EVENT_SYSTEM_ERROR,
-        EVENT_INFO)
+        EVENT_INFO,
+        EVENT_WARNING)
 
     description = models.TextField()
     event_class = models.ForeignKey(
@@ -68,8 +70,40 @@ class Event(models.Model):
             f.__doc__ = func.__doc__
             return f
 
+__EVENTCLASS_SYSTEM_NAME = 'System'
+__EVENTCLASS_MOTION_NAME = 'Motion'
+
+def dropbox_motion_video_event(dropbox_url):
+    motion_eventclass, _ = EventClass.objects.get_or_create(
+        name=__EVENTCLASS_MOTION_NAME, visible = True)
+    Event.objects.create(
+        description="New motion video taken",
+        event_class=motion_eventclass,
+        status=Event.EVENT_INFO[0],
+        url=dropbox_url,
+        url_text="View video")
+
+def dropbox_space_limit_event(mbs_remaining):
+    system_eventclass, _ = EventClass.objects.get_or_create(
+        name=__EVENTCLASS_SYSTEM_NAME, visible = True)
+    Event.objects.create(
+        description="Dropbox reaching space limit: {0} MBs remaining".format(mbs_remaining),
+        event_class=system_eventclass,
+        status=Event.EVENT_WARNING[0])
+
 def get_recent_events():
     return Event.objects.order_by('-id')[:2]
 
 def get_all_events():
     return Event.objects.order_by('-id')
+
+def get_system_events():
+    system_eventclass, _ = EventClass.objects.get_or_create(
+        name=__EVENTCLASS_SYSTEM_NAME, visible = True)
+    return Event.objects.filter(event_class = system_eventclass)
+
+def get_motion_events():
+    motion_eventclass, _ = EventClass.objects.get_or_create(
+        name=__EVENTCLASS_MOTION_NAME, visible = True)
+    return Event.objects.filter(event_class = motion_eventclass)
+
