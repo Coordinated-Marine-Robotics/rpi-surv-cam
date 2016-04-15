@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'rpisurvcam.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME':  '/home/amito/project/rpi-surv-cam/rpisurvcam/rpisurvcam.db',
+        'NAME':  'data/rpisurvcam.db',
     }
 }
 
@@ -126,11 +126,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATICFILES_DIRS = (
-    '/home/amito/project/rpi-surv-cam/setup/setup_files/static/',
-    #'/home/amito/project/rpi-surv-cam/rpisurvcam/survcam/templates/survcam/',
+    'static/',
 )
 
 STATIC_URL = '/static/'
 MEDIA_ROOT = '/var/www/media/'
 MEDIA_URL = '/media/'
-STATIC_ROOT = '/home/amito/project/rpi-surv-cam/setup/setup_files/'
+STATIC_ROOT = None
