@@ -1,14 +1,20 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.template import RequestContext
-from survcam.models import Camera
-from events.models import Event, EventClass, get_recent_events
-import pika
 import socket
 import urllib2
+import threading
 from os import path
 from time import sleep
+
+import pika
+
+from django.shortcuts import render
+from django.views.generic import View
+from django.views.generic.detail import SingleObjectMixin
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+
+from survcam.models import Camera
+from events.models import Event, EventClass, get_recent_events
 
 #TODO: remove hardcoded dependency in motion's port numbers?
 @login_required
@@ -28,22 +34,28 @@ def index(request):
              'stream_url': get_motion_stream_url(request),
              'events': get_recent_events()})
 
-@login_required
-def move(request):
-    # TODO: do connection to queue only once!
-    target = request.GET['target']
-    axis = request.GET['axis']
+@method_decorator(login_required, name='post')
+class MoveView(SingleObjectMixin, View):
+    lock = threading.Lock()
+    target = 0
 
-    queue_name = Camera.objects.first().commands_queue
-    connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host='localhost'))
-    channel = connection.channel()
-    channel.queue_declare(queue = queue_name)
-    channel.basic_publish(exchange='',
-                          routing_key=queue_name,
-                          body=(target + '@' + axis))
-    connection.close()
-    return HttpResponse('OK')
+    def post(self, request, *args, **kwargs):
+        target = request.POST['target']
+        axis = request.POST['axis']
+
+        queue_name = Camera.objects.first().commands_queue
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host='localhost'))
+        channel = connection.channel()
+        channel.queue_declare(queue = queue_name)
+        channel.basic_publish(exchange='',
+                              routing_key=queue_name,
+                              body=(target + '@' + axis))
+        connection.close()
+
+        with self.lock:
+            self.target = target
+            return JsonResponse({'target': self.target})
 
 @login_required
 def snapshot(request):
