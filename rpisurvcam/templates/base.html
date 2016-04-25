@@ -9,6 +9,7 @@
     <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'css/bootstrap-slider.min.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'css/survcam.css' %}" rel="stylesheet" type="text/css">
+    {% block extrastyle %}{% endblock %}
   </head>
   <body>
     <div class="navbar navbar-default navbar-static-top">
@@ -20,18 +21,21 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/survcam"><span>Surveillance Camera</span></a>
+          <a class="navbar-brand" href="/"><span>Surveillance Camera</span></a>
         </div>
         <div class="collapse navbar-collapse" id="navbar-ex-collapse">
           <ul class="nav navbar-nav navbar-right">
-            <li class="active">
-              <a href="#">Home</a>
-            </li>
+	{% if user.is_superuser  %}
             <li>
-              <a href="#">Settings</a>
+              <a href="{% url 'admin:index' %}">Settings</a>
             </li>
-            <li>
-              <a href="#">Login</a>
+	{% endif %}
+            <li>	
+	{% if user.is_authenticated  %}
+              <a href="{% url 'logout' %}">Logout</a>
+	{% else %}
+              <a href="{% url 'login' %}">Login</a>
+	{% endif %}
             </li>
           </ul>
         </div>

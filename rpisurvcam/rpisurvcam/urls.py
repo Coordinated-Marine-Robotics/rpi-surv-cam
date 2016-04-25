@@ -18,9 +18,15 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    url(r'^survcam/', include('survcam.urls')),
+    url(r'^', include('survcam.urls')),
     url(r'^events/', include('events.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^accounts/', include('django.contrib.auth.urls')),
 ]
+
+admin.site.site_title = 'Settings'
+admin.site.site_header = 'Surveillance Camera Web App Administration'
+admin.site.index_title = 'Raspberry Pi Surveillance Camera'

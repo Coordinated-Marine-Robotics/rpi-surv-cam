@@ -1,5 +1,6 @@
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render
 from django.http import HttpResponse
+from django.template import RequestContext
 from survcam.models import Camera
 from events.models import Event, EventClass, get_recent_events
 import pika
@@ -7,21 +8,27 @@ import socket
 import urllib2
 from os import path
 from time import sleep
+from django.contrib.auth.decorators import login_required
 
 #TODO: remove hardcoded dependency in motion's port numbers?
+@login_required
 def get_motion_stream_url(request):
     return request.build_absolute_uri('/')[:-1] + ':8081/'
 
+@login_required
 def get_motion_snapshot_url(request):
     return request.build_absolute_uri('/')[:-1] + ':8082/0/action/snapshot'
 
+@login_required
 def index(request):
-    return render_to_response(
+    return render(
+	    request,
             'survcam/stream.html',
             {'camera': Camera.objects.first(),
              'stream_url': get_motion_stream_url(request),
              'events': get_recent_events()})
 
+@login_required
 def move(request):
     # TODO: do connection to queue only once!
     target = request.GET['target']
@@ -38,6 +45,7 @@ def move(request):
     connection.close()
     return HttpResponse('OK')
 
+@login_required
 def snapshot(request):
     # Ask motion to take a snapshot
     urllib2.urlopen(get_motion_snapshot_url(request)).read()
