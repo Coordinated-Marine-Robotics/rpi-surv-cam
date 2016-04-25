@@ -1,28 +1,84 @@
-$('#ex1').slider({
+/* CSRF Protection Code: */
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+/* End of CSRF Protection Code */
+
+/* Updating sliders on page loading and consistent polling: */
+function updateSliders() {
+    $.get( "/update-target",
+           function(response) {
+            $("#tiltSlider").slider('setValue',
+                             parseInt(response.tilt_target));
+            $("#panSlider").slider('setValue',
+                             parseInt(response.pan_target));
+            });
+}
+
+function updateSlidersPolling() {
+  updateSliders()
+  setTimeout(updateSlidersPolling, 4000);
+}
+
+/* On document load: */
+$(document).ready(updateSlidersPolling);
+
+$('#tiltSlider').slider({
 	formatter: function(value) {
 		return 'Current value: ' + value;
 	}
 });
 
-$('#ex2').slider({
+$('#panSlider').slider({
 	formatter: function(value) {
 		return 'Current value: ' + value;
 	}
 });
 
-$('#ex1').slider('on','slideStop',function() {
-                $.ajax( {
-                        url:"move",
-                        data: {target: $('#ex1').val(), axis: "tilt"}
-                } )
+$('#tiltSlider').slider('on','slideStop',function() {
+                $.post( "/move",
+                        { target: $('#tiltSlider').val(), axis: "tilt" },
+                        function(response) {
+                            $("#tiltSlider").slider('setValue',
+                                             parseInt(response.target));
+                        })
          }
 );
 
-$('#ex2').slider('on','slideStop',function() {
-                $.ajax( {
-                        url:"move",
-                        data: {target: $('#ex2').val(), axis: "pan"}
-                } )
+$('#panSlider').slider('on','slideStop',function() {
+                $.post( "/move",
+                        { target: $('#panSlider').val(), axis: "pan" },
+                        function(response) {
+                            $("#panSlider").slider('setValue',
+                                             parseInt(response.target));
+                        })
          }
 );
 

@@ -11,10 +11,11 @@ from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
 
 from survcam.models import Camera
 from events.models import Event, EventClass, get_recent_events
+
+from .servotargetmanager import ServoTargetManager
 
 #TODO: remove hardcoded dependency in motion's port numbers?
 @login_required
@@ -34,28 +35,29 @@ def index(request):
              'stream_url': get_motion_stream_url(request),
              'events': get_recent_events()})
 
-@method_decorator(login_required, name='post')
-class MoveView(SingleObjectMixin, View):
-    lock = threading.Lock()
-    target = 0
+@login_required
+def update_target(request):
+    return JsonResponse(
+        {'pan_target': ServoTargetManager().get_target('pan'),
+        'tilt_target': ServoTargetManager().get_target('tilt')})
 
-    def post(self, request, *args, **kwargs):
-        target = request.POST['target']
-        axis = request.POST['axis']
+@login_required
+def move(request):
+    target = request.POST['target']
+    axis = request.POST['axis']
 
-        queue_name = Camera.objects.first().commands_queue
-        connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host='localhost'))
-        channel = connection.channel()
-        channel.queue_declare(queue = queue_name)
-        channel.basic_publish(exchange='',
-                              routing_key=queue_name,
-                              body=(target + '@' + axis))
-        connection.close()
+    queue_name = Camera.objects.first().commands_queue
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(host='localhost'))
+    channel = connection.channel()
+    channel.queue_declare(queue = queue_name)
+    channel.basic_publish(exchange='',
+                          routing_key=queue_name,
+                          body=(target + '@' + axis))
+    connection.close()
 
-        with self.lock:
-            self.target = target
-            return JsonResponse({'target': self.target})
+    ServoTargetManager().set_target(axis, target)
+    return JsonResponse({'target': ServoTargetManager().get_target(axis)})
 
 @login_required
 def snapshot(request):
