@@ -61,6 +61,8 @@ MIDDLEWARE_CLASSES = [
 ]
 
 ROOT_URLCONF = 'rpisurvcam.urls'
+APPEND_SLASH = True
+CSRF_COOKIE_SECURE = True
 
 LOGIN_REDIRECT_URL = '/'
 
