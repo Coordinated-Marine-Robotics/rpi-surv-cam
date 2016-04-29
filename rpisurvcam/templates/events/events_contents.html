@@ -1,10 +1,11 @@
 <ul class="media-list">
     {% for event in events %}
-    <li class="media">
-    <a class="pull-left" href="#"><img class="media-object" src="http://pingendo.github.io/pingendo-bootstrap/assets/placeholder.png" height="48" width="48"></a>
-    <div class="media-body">
-      <h4 class="media-heading">
-        <small>{{ event.time }}&nbsp;&nbsp;</small>{{ event.description }}
+    <li>
+    <div>
+      <h4>
+        <small>{{ event.time }}&nbsp;&nbsp;</small>
+        <br/>
+        {{ event.description }}
         <small>
           {% if event.url != None %}
           (&nbsp;<a href="{{ event.url }}">{{event.url_text}}</a>&nbsp;)

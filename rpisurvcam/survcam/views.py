@@ -18,13 +18,17 @@ from events.models import Event, EventClass, get_recent_events
 from .servotargetmanager import ServoTargetManager
 
 #TODO: remove hardcoded dependency in motion's port numbers?
-@login_required
 def get_motion_stream_url(request):
     return request.build_absolute_uri('/')[:-1] + ':8081/'
 
-@login_required
 def get_motion_snapshot_url(request):
     return request.build_absolute_uri('/')[:-1] + ':8082/0/action/snapshot'
+
+def is_stream_alive(request):
+    try:
+        return urllib2.urlopen(get_motion_stream_url(request)).getcode() == 200
+    except urllib2.URLError:
+        return False
 
 @login_required
 def index(request):
@@ -36,10 +40,12 @@ def index(request):
              'events': get_recent_events()})
 
 @login_required
-def update_target(request):
+def update_status(request):
     return JsonResponse(
-        {'pan_target': ServoTargetManager().get_target('pan'),
-        'tilt_target': ServoTargetManager().get_target('tilt')})
+        {'stream_status': is_stream_alive(request),
+        'events': [{ k: e.__dict__[k] for k in ('time','description','url','url_text','status') } for e in get_recent_events()],
+        'pan_target': ServoTargetManager().get_target('pan'),
+        'tilt_target': ServoTargetManager().get_target('tilt')}, safe=False)
 
 @login_required
 def move(request):
@@ -62,7 +68,11 @@ def move(request):
 @login_required
 def snapshot(request):
     # Ask motion to take a snapshot
-    urllib2.urlopen(get_motion_snapshot_url(request)).read()
+    try:
+        urllib2.urlopen(get_motion_snapshot_url(request)).read()
+    except:
+        # motion is probably down, abort
+        return HttpResponse()
     # Give the file time to be written
     sleep(1)
     # Read file contents and return in response

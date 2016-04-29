@@ -31,10 +31,11 @@ $.ajaxSetup({
 
 /* End of CSRF Protection Code */
 
-/* Updating sliders on page loading and consistent polling: */
-function updateSliders() {
-    $.get( "/update-target",
+/* Updating stream status, events and sliders on page load and consistent polling: */
+function updateStatus() {
+    $.get( "/update-status",
            function(response) {
+            refresh_stream_status(response.stream_status);
             $("#tiltSlider").slider('setValue',
                              parseInt(response.tilt_target));
             $("#panSlider").slider('setValue',
@@ -42,23 +43,23 @@ function updateSliders() {
             });
 }
 
-function updateSlidersPolling() {
-  updateSliders()
-  setTimeout(updateSlidersPolling, 4000);
+function updateStatusPolling() {
+  updateStatus()
+  setTimeout(updateStatusPolling, 4000);
 }
 
 /* On document load: */
-$(document).ready(updateSlidersPolling);
+$(document).ready(updateStatusPolling);
 
 $('#tiltSlider').slider({
 	formatter: function(value) {
-		return 'Current value: ' + value;
+		return value + '°';
 	}
 });
 
 $('#panSlider').slider({
 	formatter: function(value) {
-		return 'Current value: ' + value;
+		return value + '°';
 	}
 });
 
@@ -82,11 +83,15 @@ $('#panSlider').slider('on','slideStop',function() {
          }
 );
 
-var $image = $("#stream-img");
+// To keep the vertical slider height responsive
+function fixTiltSliderHeight() {
+    $('#tiltSliderCol').height($('#streamCol').height())
+}
 
-$image.error(function() {
-$("#stream-status").html("<strong>Status: </strong> Down").removeClass('list-group-item-success').addClass('list-group-item-danger');
-});
+$(window).resize(fixTiltSliderHeight);
+//$(window).load(fixTiltSliderHeight);
+
+var stream_url = $(".stream-img").attr("src");
 
 /*
 $.ajaxSetup({
@@ -94,21 +99,12 @@ $.ajaxSetup({
 });
 */
 
-function refresh_stream () {
-	var $downloadingImage = $("<img>");
-	$downloadingImage.load(/* $image.attr("src"),*/
-		function(response, lstatus, xhr) {
-       		 	if (lstatus == "error") {
-				$("#stream-status").html("<strong>Status: </strong> Down").removeClass('list-group-item-success').addClass('list-group-item-danger');
-			} else {
-				$("#stream-status").html("<strong>Status: </strong> Live").removeClass('list-group-item-danger').addClass('list-group-item-success');
-  				$image.attr("src", $(this).attr("src"));
-			}
-		}
-	);
-	$downloadingImage.attr("src", $image.attr("src"));
+function refresh_stream_status(stream_alive) {
+	if (stream_alive) {
+    $("#stream-status").html("<strong>Status: </strong> Live").removeClass('list-group-item-danger').addClass('list-group-item-success');
+    $(".stream-img").attr("src", stream_url);
+	} else {
+		$("#stream-status").html("<strong>Status: </strong> Down").removeClass('list-group-item-success').addClass('list-group-item-danger');
+    $(".stream-img").attr("src", "static/img/stream_down.png");
+	}
 }
-
-refresh_stream();
-setInterval(refresh_stream ,2000);
-

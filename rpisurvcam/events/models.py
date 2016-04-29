@@ -92,7 +92,7 @@ def dropbox_space_limit_event(mbs_remaining):
         status=Event.EVENT_WARNING[0])
 
 def get_recent_events():
-    return Event.objects.order_by('-id')[:2]
+    return Event.objects.order_by('-id')[:5]
 
 def get_all_events():
     return Event.objects.order_by('-id')
@@ -100,10 +100,10 @@ def get_all_events():
 def get_system_events():
     system_eventclass, _ = EventClass.objects.get_or_create(
         name=__EVENTCLASS_SYSTEM_NAME, visible = True)
-    return Event.objects.filter(event_class = system_eventclass)
+    return Event.objects.filter(event_class = system_eventclass).order_by('-id')
 
 def get_motion_events():
     motion_eventclass, _ = EventClass.objects.get_or_create(
         name=__EVENTCLASS_MOTION_NAME, visible = True)
-    return Event.objects.filter(event_class = motion_eventclass)
+    return Event.objects.filter(event_class = motion_eventclass).order_by('-id')
 

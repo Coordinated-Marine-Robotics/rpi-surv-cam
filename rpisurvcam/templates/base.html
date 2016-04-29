@@ -12,7 +12,7 @@
     {% block extrastyle %}{% endblock %}
   </head>
   <body>
-    <div class="navbar navbar-default navbar-static-top">
+    <div class="navbar navbar-default navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-ex-collapse">
@@ -24,13 +24,18 @@
           <a class="navbar-brand" href="/"><span>Surveillance Camera</span></a>
         </div>
         <div class="collapse navbar-collapse" id="navbar-ex-collapse">
+	  <ul class="nav navbar-nav">
+	    <li><a href="/">Captured videos</a></li>
+	    <li><a href="/">Scheduled tasks</a></li>
+	    <li><a href="{% url 'events' %}">Events</a></li>
+	  </ul>
           <ul class="nav navbar-nav navbar-right">
 	{% if user.is_superuser  %}
             <li>
               <a href="{% url 'admin:index' %}">Settings</a>
             </li>
 	{% endif %}
-            <li>	
+            <li>
 	{% if user.is_authenticated  %}
               <a href="{% url 'logout' %}">Logout</a>
 	{% else %}
@@ -43,21 +48,7 @@
     </div>
     <div class="section">
       <div class="container">
-        <div class="row ">
-          <div class="col-md-2">
-            <div class="btn-group btn-group-vertical">
-              <a href="#" class="btn btn-default">Live Stream</a>
-              <a href="#" class="btn btn-default">Last 5 min.</a>
-              <a href="#" class="btn btn-default">Saved Snapshots<br></a>
-              <a class="btn btn-default">Scheduled Tasks<br></a>
-            </div>
-          </div>
-          <div class="col-md-10">
-            <div class="container-fluid">
-              {% block body_block %}{% endblock body_block %}
-            </div>
-          </div>
-        </div>
+        {% block body_block %}{% endblock body_block %}
       </div>
     </div>
   </body>
