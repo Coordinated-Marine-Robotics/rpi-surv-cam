@@ -25,6 +25,11 @@
   width: 800px;
   height: 600px;
 }
+#tap-snapshot-alert {
+  position:absolute;
+  z-index:1;
+  width:70%;
+}
 /*! normalize.css v3.0.2 | MIT License | git.io/normalize */
 html {
   font-family: sans-serif;

@@ -9,7 +9,7 @@ import pika
 from django.shortcuts import render
 from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest, FileResponse
 from django.contrib.auth.decorators import login_required
 
 from survcam.models import Camera
@@ -26,8 +26,8 @@ def get_motion_snapshot_url(request):
 
 def is_stream_alive(request):
     try:
-        return urllib2.urlopen(get_motion_stream_url(request)).getcode() == 200
-    except urllib2.URLError:
+        return urllib2.urlopen(get_motion_stream_url(request), timeout = 2).getcode() == 200
+    except:
         return False
 
 @login_required
@@ -72,15 +72,14 @@ def snapshot(request):
         urllib2.urlopen(get_motion_snapshot_url(request)).read()
     except:
         # motion is probably down, abort
-        return HttpResponse()
+        return HttpResponseBadRequest()
     # Give the file time to be written
     sleep(1)
     # Read file contents and return in response
     #TODO: remove hardcoded dependency in motion's data directory
     snapshot_file = open('/home/pi/motion_data/lastsnap.jpg','rb')
-    response = HttpResponse(snapshot_file.read())
+    response = FileResponse(snapshot_file);
     response['Content-Type'] = 'mimetype/submimetype'
-    response['Content-Disposition'] = (
-        'attachment; filename=%s' %
-        path.basename(path.realpath(snapshot_file.name)))
+    response['Content-Disposition'] = ('attachment; filename=%s' %
+    path.basename(path.realpath(snapshot_file.name)))
     return response
