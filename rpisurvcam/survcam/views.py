@@ -36,11 +36,14 @@ def is_stream_alive(request):
 
 @login_required
 def index(request):
+    stream_active = is_stream_alive(request)
     return render(
         request,
             'survcam/stream.html',
             {'camera': Camera.objects.first(),
-             'stream_url': get_motion_stream_url(request),
+             'status': 'Live' if stream_active else 'Down',
+             'stream_url': get_motion_stream_url(request) if stream_active
+             else 'static/img/stream_down.png',
              'events': get_recent_events()})
 
 @login_required
@@ -48,8 +51,15 @@ def update_status(request):
     events = TemplateResponse(request, 'events/events_contents.html',
                              {'events':get_recent_events()})
     events.render()
+
+    stream_active = is_stream_alive(request)
+    stream_status_html = TemplateResponse(request, 'survcam/camera_status.html',
+                                     {'camera': Camera.objects.first(),
+                                     'status': 'Live' if stream_active
+                                      else False})
     return JsonResponse(
-        {'stream_status': is_stream_alive(request),
+        {'stream_active': stream_active,
+        'stream_status_html': stream_status_html.rendered_content,
         'events': events.rendered_content,
         'pan_target': ServoTargetManager().get_target('pan'),
         'tilt_target': ServoTargetManager().get_target('tilt')}, safe=False)

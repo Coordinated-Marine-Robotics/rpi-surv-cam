@@ -25,24 +25,8 @@
       </div>
     </div>
   </div>
-  <div class="col-sm-4">
-    <h3>Camera Details</h3>
-    <ul class="list-group">
-      <li id="stream-status" class="list-group-item list-group-item-success">
-        <strong>Status:&nbsp;</strong>Live</li>
-      <li class="list-group-item">
-        <strong>Name:&nbsp;</strong>{{ camera.name }}</li>
-      <li class="list-group-item">
-        <strong>Location:&nbsp;</strong>{{ camera.location }}</li>
-      <li class="list-group-item">
-        <strong>Resolution:&nbsp;</strong>{{ camera.resolution }}</li>
-      <li class="list-group-item">
-        <strong>Frame rate:&nbsp;</strong>{{ camera.fps }} fps</li>
-      <li class="list-group-item">
-        <strong>Uptime:&nbsp;</strong>12 days, 3 hours</li>
-      <li class="list-group-item">
-        <strong>Last snapshot:&nbsp;</strong>21/04/16 14:32</li>
-    </ul>
+  <div class="col-sm-4" id="stream-status">
+    {% include "survcam/camera_status.html" %}
     <div class="text-center hidden-xs hidden-sm">
       <div class="btn-group" role="group">
         <a class="btn btn-default snapshot-btn" type="button">
