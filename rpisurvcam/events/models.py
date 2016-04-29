@@ -48,8 +48,8 @@ class Event(models.Model):
     url_text = models.CharField(max_length = 50, blank=True)
 
     class register(object):
-        def __init__(self, user, description, event_class, status,
-                     url=None, url_text=None):
+        def __init__(self, description, event_class, status,
+                     url='', url_text=''):
             self._description = description
             self._event_class = EventClass.objects.get(name=event_class)
             self._status = status

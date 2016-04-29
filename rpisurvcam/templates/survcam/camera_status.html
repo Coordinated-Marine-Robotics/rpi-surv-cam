@@ -6,7 +6,14 @@
         <li class="list-group-item list-group-item-danger">
       {% endif %}
         <strong>Status:&nbsp;</strong>{{ status }}&nbsp;
-        <span class="glyphicon glyphicon-off"></span></li>
+        {% if request.user.is_staff %}
+          {% if status == "Live" %}
+            <a class="glyphicon glyphicon-off" href="#" id="camera-off"}></a>
+          {% elif status == "Down" %}
+            <a class="glyphicon glyphicon-off" href="#" id="camera-on"></a>
+          {% endif %}
+        {% endif %}
+        </li>
       <li class="list-group-item">
         <strong>Name:&nbsp;</strong>{{ camera.name }}</li>
       <li class="list-group-item">

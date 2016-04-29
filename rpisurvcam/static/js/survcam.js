@@ -66,6 +66,11 @@ function updateStatusPolling() {
   setTimeout(updateStatusPolling, 4000);
 }
 
+function showModal(modal_html) {
+  $(".modal-body").html(modal_html);
+  $("#modal").modal("show");
+}
+
 /* On document load: */
 $(document).ready(updateStatusPolling);
 
@@ -122,3 +127,15 @@ $(".snapshot-btn").click(function() {
       }
     });
 });
+
+$("#camera-on").click(function() {
+  $.get("/camera-on");
+  showModal(
+      "<p>Camera turned on, please wait shortly for streaming to start.</p>");
+});
+
+$("#camera-off").click(function() {
+  $.get("/camera-off");
+  showModal(
+      "<p>Camera turned off, streaming will now stop.</p>");
+})

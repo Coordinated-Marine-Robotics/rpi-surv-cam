@@ -14,6 +14,7 @@ from django.http import JsonResponse, FileResponse
 from django.template.response import TemplateResponse
 from django.core import serializers
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 
 from survcam.models import Camera
 from events.models import Event, EventClass, get_recent_events
@@ -100,3 +101,15 @@ def snapshot(request):
     response['Content-Disposition'] = ('attachment; filename=%s' %
     path.basename(path.realpath(snapshot_file.name)))
     return response
+
+@staff_member_required
+@login_required
+@Event.register("Camera turned ON", 'System', Event.EVENT_INFO)
+def camera_on(request):
+    return HttpResponse(200)
+
+@staff_member_required
+@login_required
+@Event.register("Camera turned OFF", 'System', Event.EVENT_INFO)
+def camera_off(request):
+    return HttpResponse(200)
