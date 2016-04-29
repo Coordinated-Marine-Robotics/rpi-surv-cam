@@ -1,4 +1,7 @@
 <ul class="media-list">
+    {% if not events %}
+      No events yet...
+    {% endif %}
     {% for event in events %}
     <li>
     <div>
@@ -7,17 +10,17 @@
         <br/>
         {{ event.description }}
         <small>
-          {% if event.url != None %}
-          (&nbsp;<a href="{{ event.url }}">{{event.url_text}}</a>&nbsp;)
+          {% if event.url != '' %}
+            (&nbsp;<a href="{{ event.url }}">{{event.url_text}}</a>&nbsp;)
           {% endif %}
           {% if event.status == 0 %}
-          <span class="label label-success">&nbsp;&nbsp;Success
+            <span class="label label-success">&nbsp;&nbsp;Success
           {% elif event.status == 2 %}
-          <span class="label label-danger">&nbsp;&nbsp;System Error
+            <span class="label label-danger">&nbsp;&nbsp;System Error
           {% elif event.status == 3 %}
-          <span class="label label-info">&nbsp;&nbsp;Info
+            <span class="label label-info">&nbsp;&nbsp;Info
           {% elif event.status == 4 %}
-          <span class="label label-warning">&nbsp;&nbsp;Warning
+            <span class="label label-warning">&nbsp;&nbsp;Warning
           {% endif %}
         &nbsp;&nbsp;</span></small>
       </h4>

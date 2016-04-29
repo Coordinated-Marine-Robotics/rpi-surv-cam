@@ -44,8 +44,8 @@ class Event(models.Model):
     time = models.DateTimeField(
         auto_now=False,
         auto_now_add=True)
-    url = models.URLField(max_length = 200, null=True)
-    url_text = models.CharField(max_length = 50, null=True)
+    url = models.URLField(max_length = 200, blank=True)
+    url_text = models.CharField(max_length = 50, blank=True)
 
     class register(object):
         def __init__(self, user, description, event_class, status,
