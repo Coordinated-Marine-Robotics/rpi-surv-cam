@@ -9,7 +9,10 @@ import pika
 from django.shortcuts import render
 from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin
-from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest, FileResponse
+from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import JsonResponse, FileResponse
+from django.template.response import TemplateResponse
+from django.core import serializers
 from django.contrib.auth.decorators import login_required
 
 from survcam.models import Camera
@@ -26,14 +29,15 @@ def get_motion_snapshot_url(request):
 
 def is_stream_alive(request):
     try:
-        return urllib2.urlopen(get_motion_stream_url(request), timeout = 2).getcode() == 200
+        return urllib2.urlopen(get_motion_stream_url(request),
+                               timeout = 2).getcode() == 200
     except:
         return False
 
 @login_required
 def index(request):
     return render(
-	    request,
+        request,
             'survcam/stream.html',
             {'camera': Camera.objects.first(),
              'stream_url': get_motion_stream_url(request),
@@ -41,9 +45,12 @@ def index(request):
 
 @login_required
 def update_status(request):
+    events = TemplateResponse(request, 'events/events_contents.html',
+                             {'events':get_recent_events()})
+    events.render()
     return JsonResponse(
         {'stream_status': is_stream_alive(request),
-        'events': [{ k: e.__dict__[k] for k in ('time','description','url','url_text','status') } for e in get_recent_events()],
+        'events': events.rendered_content,
         'pan_target': ServoTargetManager().get_target('pan'),
         'tilt_target': ServoTargetManager().get_target('tilt')}, safe=False)
 
