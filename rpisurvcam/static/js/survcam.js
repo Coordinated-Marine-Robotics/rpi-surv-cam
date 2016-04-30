@@ -38,10 +38,10 @@ function refreshEvents(events_html) {
 
 var stream_url = $(".stream-img").attr("src");
 
-function refreshStreamStatus(stream_status, stream_status_html) {
-  $("#stream_status").html(stream_status_html);
+function refreshStreamStatus(stream_active, stream_status_html) {
+  $("#stream-status").html(stream_status_html);
 
-  if (stream_status) {
+  if (stream_active) {
     $(".stream-img").attr("src", stream_url);
   } else {
     $(".stream-img").attr("src", "static/img/stream_down.png");
@@ -51,7 +51,7 @@ function refreshStreamStatus(stream_status, stream_status_html) {
 function updateStatus() {
     $.get( "/update-status",
            function(response) {
-            refreshStreamStatus(response.stream_status,
+            refreshStreamStatus(response.stream_active,
                                 response.stream_status_html);
             refreshEvents(response.events);
             $("#tiltSlider").slider('setValue',

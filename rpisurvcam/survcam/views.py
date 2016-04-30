@@ -3,6 +3,7 @@ import urllib2
 import threading
 from os import path
 from time import sleep
+from re import findall
 
 import pika
 
@@ -17,7 +18,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 
 from survcam.models import Camera
-from events.models import Event, EventClass, get_recent_events
+from events.models import Event, EventClass, get_recent_events, get_motion_events
 
 from .servotargetmanager import ServoTargetManager
 
@@ -28,12 +29,35 @@ def get_motion_stream_url(request):
 def get_motion_snapshot_url(request):
     return request.build_absolute_uri('/')[:-1] + ':8082/0/action/snapshot'
 
+def get_motion_query_url(request, param):
+    return request.build_absolute_uri('/')[:-1] + ':8082/0/config/get?query=' + param
+
+def get_motion_config_param(request, param):
+    query_url = get_motion_query_url(request, param)
+    try:
+        response = urllib2.urlopen(query_url, timeout = 1)
+        if response.getcode() != 200:
+            return None
+        return findall(".*\s=\s(\d+)\s", response.read())[0]
+    except:
+        return None
+
 def is_stream_alive(request):
     try:
         return urllib2.urlopen(get_motion_stream_url(request),
                                timeout = 2).getcode() == 200
     except:
         return False
+
+def get_camera_details(request):
+    last_motion = get_motion_events().first()
+    last_motion_time = None if last_motion is None else last_motion.time
+    return {
+        'res_width': get_motion_config_param(request,'width'),
+        'res_height': get_motion_config_param(request,'height'),
+        'fps': get_motion_config_param(request,'framerate'),
+        'last_motion': last_motion_time
+    }
 
 @login_required
 def index(request):
@@ -42,9 +66,9 @@ def index(request):
         request,
             'survcam/stream.html',
             {'camera': Camera.objects.first(),
-             'status': 'Live' if stream_active else 'Down',
-             'stream_url': get_motion_stream_url(request) if stream_active
-             else 'static/img/stream_down.png',
+             'camera_details': get_camera_details(request),
+             'stream_active': stream_active,
+             'stream_url': get_motion_stream_url(request),
              'events': get_recent_events()})
 
 @login_required
@@ -56,8 +80,9 @@ def update_status(request):
     stream_active = is_stream_alive(request)
     stream_status_html = TemplateResponse(request, 'survcam/camera_status.html',
                                      {'camera': Camera.objects.first(),
-                                     'status': 'Live' if stream_active
-                                      else False})
+                                     'camera_details': get_camera_details(request),
+                                     'stream_active': stream_active})
+    print get_motion_config_param(request,'width')
     return JsonResponse(
         {'stream_active': stream_active,
         'stream_status_html': stream_status_html.rendered_content,

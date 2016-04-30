@@ -1,29 +1,41 @@
 <h3>Camera Details</h3>
-    <ul class="list-group">
-      {% if status == "Live" %}
-        <li class="list-group-item list-group-item-success">
-      {% elif status == "Down" %}
-        <li class="list-group-item list-group-item-danger">
+<ul class="list-group">
+  {% if stream_active  %}
+    <li class="list-group-item list-group-item-success">
+  {% else %}
+    <li class="list-group-item list-group-item-danger">
+  {% endif %}
+    <strong>Status:&nbsp;</strong>{% if stream_active %} Live {% else %} Down {% endif %}&nbsp;
+    {% if request.user.is_staff %}
+    <strong>
+      {% if stream_active %}
+      <a href="#" class="text-danger pull-right">
+        <span class="glyphicon glyphicon-off" id="camera-off"></span>
+      </a>
+      {% else %}
+      <a href="#" class="text-success pull-right">
+        <span class="glyphicon glyphicon-off" id="camera-on"></span>
+      </a>
       {% endif %}
-        <strong>Status:&nbsp;</strong>{{ status }}&nbsp;
-        {% if request.user.is_staff %}
-          {% if status == "Live" %}
-            <a class="glyphicon glyphicon-off" href="#" id="camera-off"}></a>
-          {% elif status == "Down" %}
-            <a class="glyphicon glyphicon-off" href="#" id="camera-on"></a>
-          {% endif %}
-        {% endif %}
-        </li>
-      <li class="list-group-item">
-        <strong>Name:&nbsp;</strong>{{ camera.name }}</li>
-      <li class="list-group-item">
-        <strong>Location:&nbsp;</strong>{{ camera.location }}</li>
-      <li class="list-group-item">
-        <strong>Resolution:&nbsp;</strong>{{ camera.resolution }}</li>
-      <li class="list-group-item">
-        <strong>Frame rate:&nbsp;</strong>{{ camera.fps }} fps</li>
-      <li class="list-group-item">
-        <strong>Uptime:&nbsp;</strong>12 days, 3 hours</li>
-      <li class="list-group-item">
-        <strong>Last snapshot:&nbsp;</strong>21/04/16 14:32</li>
-    </ul>
+    </strong>
+    {% endif %}
+    </li>
+  <li class="list-group-item">
+    <strong>Name:&nbsp;</strong>{{ camera.name }}</li>
+  <li class="list-group-item">
+    <strong>Location:&nbsp;</strong>{{ camera.location }}</li>
+  {% if stream_active %}
+  <li class="list-group-item">
+    <strong>Resolution:&nbsp;</strong>
+    {{ camera_details.res_width }}x{{ camera_details.res_height }}
+  </li>
+  <li class="list-group-item">
+    <strong>Frame rate:&nbsp;</strong>
+    {{ camera_details.fps }} fps
+  </li>
+  <li class="list-group-item">
+    <strong>Last motion detected:&nbsp;</strong>
+    {{ camera_details.last_motion }}
+  </li>
+  {% endif %}
+</ul>
