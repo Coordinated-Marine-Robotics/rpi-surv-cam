@@ -22,7 +22,10 @@ from events.models import Event, EventClass, get_recent_events, get_motion_event
 
 from .servotargetmanager import ServoTargetManager
 
-#TODO: remove hardcoded dependency in motion's port numbers?
+#TODO: remove hardcoded dependency in motion / uv4l port numbers?
+def get_camera_control_url(request):
+    return request.build_absolute_uri('/')[:-1] + ':9090/panel'
+
 def get_motion_stream_url(request):
     return request.build_absolute_uri('/')[:-1] + ':8081/'
 
@@ -56,7 +59,8 @@ def get_camera_details(request):
         'res_width': get_motion_config_param(request,'width'),
         'res_height': get_motion_config_param(request,'height'),
         'fps': get_motion_config_param(request,'framerate'),
-        'last_motion': last_motion_time
+        'last_motion': last_motion_time,
+        'control_url': get_camera_control_url(request)
     }
 
 @login_required
@@ -82,7 +86,6 @@ def update_status(request):
                                      {'camera': Camera.objects.first(),
                                      'camera_details': get_camera_details(request),
                                      'stream_active': stream_active})
-    print get_motion_config_param(request,'width')
     return JsonResponse(
         {'stream_active': stream_active,
         'stream_status_html': stream_status_html.rendered_content,
