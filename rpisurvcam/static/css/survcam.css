@@ -32,6 +32,8 @@
 }
 #camera-control, #camera-on, #camera-off {
   font-size: 115%;
+}
+#camera-control {
   padding-right: 5px;
 }
 /*! normalize.css v3.0.2 | MIT License | git.io/normalize */
