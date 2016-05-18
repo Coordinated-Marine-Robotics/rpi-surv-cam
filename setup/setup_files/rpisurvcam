@@ -8,7 +8,8 @@ server {
     listen 80;
 
     # look in this directory for files to serve
-    root /var/www/;
+    # root /var/www/;   
+    root /home/pi/rpisurvcam/; 
 
     # keep logs in these files
     access_log /var/log/nginx/django_project_name_access.log;
