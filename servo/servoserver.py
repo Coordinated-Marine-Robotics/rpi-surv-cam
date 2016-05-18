@@ -11,6 +11,10 @@ from control.maestroconfig import MaestroConnectionConfig
 
 import pika
 
+import imp
+imp.load_source("platform_settings", "/var/opt/platform_settings.py")
+from platform_settings import SERVO_CMD_QUEUE
+
 app_logger = logging.getLogger("appLogger")
 servo_logger = logging.getLogger("servoLogger")
 app_logger.setLevel(logging.DEBUG)
@@ -51,9 +55,9 @@ def main():
         connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
         channel = connection.channel()
 
-        channel.queue_declare(queue='camcmd')
+        channel.queue_declare(queue=SERVO_CMD_QUEUE)
 
-        channel.basic_consume(callback,queue='camcmd',no_ack=True)
+        channel.basic_consume(callback,queue=SERVO_CMD_QUEUE,no_ack=True)
         channel.start_consuming()
 
 

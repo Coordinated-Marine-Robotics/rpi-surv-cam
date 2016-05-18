@@ -141,3 +141,8 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = '/var/www/media/'
 MEDIA_URL = '/media/'
 STATIC_ROOT = None
+
+# Import local machine settings
+import imp
+imp.load_source("platform_settings", "/var/opt/platform_settings.py")
+from platform_settings import *

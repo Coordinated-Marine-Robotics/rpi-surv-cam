@@ -4,9 +4,9 @@ import threading
 from os import path
 from time import sleep
 from re import findall
-
 import pika
 
+from django.conf import settings
 from django.shortcuts import render
 from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin
@@ -22,18 +22,22 @@ from events.models import Event, EventClass, get_recent_events, get_motion_event
 
 from .servotargetmanager import ServoTargetManager
 
-#TODO: remove hardcoded dependency in motion / uv4l port numbers?
+
 def get_camera_control_url(request):
-    return request.build_absolute_uri('/')[:-1] + ':9090/panel'
+    return '%s:%d/panel' % \
+        (request.build_absolute_uri('/')[:-1], settings.UV4L_SERVER_PORT)
 
 def get_motion_stream_url(request):
-    return request.build_absolute_uri('/')[:-1] + ':8081/'
+    return '%s:%d/' % \
+        (request.build_absolute_uri('/')[:-1], settings.MOTION_STREAM_PORT)
 
 def get_motion_snapshot_url(request):
-    return request.build_absolute_uri('/')[:-1] + ':8082/0/action/snapshot'
+    return '%s:%d/0/action/snapshot' % \
+        (request.build_absolute_uri('/')[:-1], settings.MOTION_CONTROL_PORT)
 
 def get_motion_query_url(request, param):
-    return request.build_absolute_uri('/')[:-1] + ':8082/0/config/get?query=' + param
+    return '%s:%d/0/config/get?query=%s' % \
+        (request.build_absolute_uri('/')[:-1], settings.MOTION_CONTROL_PORT, param)
 
 def get_motion_config_param(request, param):
     query_url = get_motion_query_url(request, param)
@@ -98,7 +102,7 @@ def move(request):
     target = request.POST['target']
     axis = request.POST['axis']
 
-    queue_name = Camera.objects.first().commands_queue
+    queue_name = settings.SERVO_CMD_QUEUE
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
@@ -122,8 +126,8 @@ def snapshot(request):
     # Give the file time to be written
     sleep(1)
     # Read file contents and return in response
-    #TODO: remove hardcoded dependency in motion's data directory
-    snapshot_file = open('/home/pi/motion_data/lastsnap.jpg','rb')
+    snapshot_path = path.join(settings.MOTION_TARGET_DIR,'lastsnap.jpg')
+    snapshot_file = open(snapshot_path, 'rb')
     response = FileResponse(snapshot_file);
     response['Content-Type'] = 'mimetype/submimetype'
     response['Content-Disposition'] = ('attachment; filename=%s' %
