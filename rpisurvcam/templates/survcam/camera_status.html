@@ -1,9 +1,9 @@
 <h3>Camera Details</h3>
 <ul class="list-group">
   {% if stream_active  %}
-    <li class="list-group-item list-group-item-success">
+  <li class="list-group-item list-group-item-success">
   {% else %}
-    <li class="list-group-item list-group-item-danger">
+  <li class="list-group-item list-group-item-danger">
   {% endif %}
     <strong>Status:&nbsp;</strong>{% if stream_active %} Live {% else %} Down {% endif %}&nbsp;
     {% if request.user.is_staff %}
@@ -22,11 +22,13 @@
       {% endif %}
     </strong>
     {% endif %}
-    </li>
+  </li>
+  {% if camera != None %}
   <li class="list-group-item">
     <strong>Name:&nbsp;</strong>{{ camera.name }}</li>
   <li class="list-group-item">
     <strong>Location:&nbsp;</strong>{{ camera.location }}</li>
+  {% endif %}
   {% if stream_active %}
   <li class="list-group-item">
     <strong>Resolution:&nbsp;</strong>
