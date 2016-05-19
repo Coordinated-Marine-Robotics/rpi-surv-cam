@@ -9,14 +9,14 @@
     {% if request.user.is_staff %}
     <strong>
       {% if stream_active %}
-      <a href="#" class="text-danger pull-right">
+      <a href="{% url 'camera_off' %}" class="text-danger pull-right">
         <span class="glyphicon glyphicon-off" id="camera-off"></span>
       </a>
       <a href="{{ camera_details.control_url }}" target="_blank" class="text-muted pull-right">
         <span class="glyphicon glyphicon-cog" id="camera-control"></span>
       </a>
       {% else %}
-      <a href="#" class="text-success pull-right">
+      <a href="{% url 'camera_on' %}" class="text-success pull-right">
         <span class="glyphicon glyphicon-off" id="camera-on"></span>
       </a>
       {% endif %}

@@ -1,13 +1,13 @@
 import socket
 import urllib2
 import threading
-from os import path
+from os import path, system
 from time import sleep
 from re import findall
 import pika
 
 from django.conf import settings
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -138,10 +138,12 @@ def snapshot(request):
 @login_required
 @Event.register("Camera turned ON", 'System', Event.EVENT_INFO)
 def camera_on(request):
-    return HttpResponse(200)
+    system('start-stop-daemon --start -o --exec /usr/bin/motion -b')
+    return redirect('index')
 
 @staff_member_required
 @login_required
 @Event.register("Camera turned OFF", 'System', Event.EVENT_INFO)
 def camera_off(request):
-    return HttpResponse(200)
+    system('start-stop-daemon --stop -o --exec /usr/bin/motion')
+    return redirect('index')
