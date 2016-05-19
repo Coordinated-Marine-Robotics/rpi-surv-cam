@@ -138,12 +138,12 @@ def snapshot(request):
 @login_required
 @Event.register("Camera turned ON", 'System', Event.EVENT_INFO)
 def camera_on(request):
-    system('start-stop-daemon --start -o --exec /usr/bin/motion -b')
+    system('start-stop-daemon --start -o -b --exec ' + settings.MOTION_BIN_PATH)
     return redirect('index')
 
 @staff_member_required
 @login_required
 @Event.register("Camera turned OFF", 'System', Event.EVENT_INFO)
 def camera_off(request):
-    system('start-stop-daemon --stop -o --exec /usr/bin/motion')
+    system('start-stop-daemon --stop -o --exec ' + settings.MOTION_BIN_PATH)
     return redirect('index')
