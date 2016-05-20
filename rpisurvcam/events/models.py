@@ -48,19 +48,23 @@ class Event(models.Model):
     url_text = models.CharField(max_length = 50, blank=True)
 
     class register(object):
-        def __init__(self, description, event_class, status,
+        def __init__(self, description, event_class_name, status,
                      url='', url_text=''):
             self._description = description
-            self._event_class = EventClass.objects.get(name=event_class)
+            self._event_class_name = event_class_name
             self._status = status
             self._url = url
             self._url_text = url_text
 
         def __call__(self, func):
             def f(*args, **kwargs):
+                # We query the event class here so the view won't have any
+                # side effects on import. This can also be handled using
+                # OperationalError exception in the __init__ part:
+                event_class, _ = EventClass.objects.get_or_create(name=self._event_class_name)
                 Event.objects.create(
                     description=self._description,
-                    event_class=self._event_class,
+                    event_class=event_class,
                     status=self._status[0],
                     url=self._url,
                     url_text=self._url_text)
@@ -106,4 +110,3 @@ def get_motion_events():
     motion_eventclass, _ = EventClass.objects.get_or_create(
         name=__EVENTCLASS_MOTION_NAME, visible = True)
     return Event.objects.filter(event_class = motion_eventclass).order_by('-id')
-
