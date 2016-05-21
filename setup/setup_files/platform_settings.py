@@ -18,3 +18,9 @@ MOTION_BIN_PATH = '/usr/bin/motion'
 
 # UV4L server port for web control interface - chosen when running uv4l
 UV4L_SERVER_PORT = 9090
+
+# Shared URL for Dropbox videos directory
+DROPBOX_VIDEOS_URL = ''
+
+# Shared URL for Dropbox images directory
+DROPBOX_IMAGES_URL = ''
