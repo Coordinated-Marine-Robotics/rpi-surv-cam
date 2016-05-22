@@ -107,6 +107,16 @@ def dropbox_space_limit_event(mbs_remaining):
         event_class=dropbox_eventclass,
         status=Event.EVENT_WARNING[0])
 
+def dropbox_upload_error_event():
+    dropbox_eventclass, _ = EventClass.objects.get_or_create(
+        name=__EVENTCLASS_DROPBOX_NAME, visible = True)
+    Event.objects.create(
+        description="Error occurred while trying to upload video to Dropbox",
+        event_class=dropbox_eventclass,
+        status=Event.EVENT_FAILURE[0],
+        url=settings.DROPBOX_VIDEOS_URL,
+        url_text="is it full?")
+
 def remove_motion_video_url(event_id):
     event = Event.objects.get(id=event_id)
     event.url = ''

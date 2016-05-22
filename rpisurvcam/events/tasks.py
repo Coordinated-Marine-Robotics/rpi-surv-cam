@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from celery import app, Celery
 from .models import dropbox_space_limit_event, dropbox_motion_video_event
 from .models import new_motion_detected_event, remove_motion_video_url
+from .models import dropbox_upload_error_event
 from django.conf import settings
 import os
 import subprocess
@@ -93,7 +94,12 @@ def new_motion_detected(filepath):
 
     # Get remote video URL and add event to web app,
     # assuming output line format:  > Uploading "local_path" to "remote_path"... DONE
-    remote_file = proc.stdout.read().split('"')[3]
+    output = proc.stdout.read()
+    if 'DONE' not in output:
+        # There was an error while uploading the video to Dropbox, abort.
+        dropbox_upload_error_event()
+        return
+    remote_file = output.split('"')[3]
     proc = subprocess.Popen([settings.DROPBOX_UPLOADER, 'share', remote_file],
                             stdout=subprocess.PIPE)
     # assuming output format:  > Share link: https://db.tt/a9xJoX9X
