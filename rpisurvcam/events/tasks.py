@@ -1,8 +1,8 @@
 #!/usr/bin/python
 from __future__ import absolute_import
-from celery import app
-from celery import Celery
+from celery import app, Celery
 from .models import dropbox_space_limit_event, dropbox_motion_video_event
+from .models import new_motion_detected_event, remove_motion_video_url
 from django.conf import settings
 import os
 import subprocess
@@ -77,3 +77,33 @@ def upload_motion_to_dropbox():
     #os.system("rm -f " + os.path.join(motion_path, "*.jpg"))
 
     alert_if_dropbox_full()
+
+@app.task
+def new_motion_detected(filepath):
+    if not os.path.isfile(filepath):
+        return
+
+    # Add event to let web app users know motion was detected
+    event_id = new_motion_detected_event(os.path.basename(filepath))
+
+    # Upload motion video to Dropbox
+    proc = subprocess.Popen([settings.DROPBOX_UPLOADER, 'upload',
+                            filepath, dropbox_videos],
+                            stdout=subprocess.PIPE)
+
+    # Get remote video URL and add event to web app,
+    # assuming output line format:  > Uploading "local_path" to "remote_path"... DONE
+    remote_file = proc.stdout.read().split('"')[3]
+    proc = subprocess.Popen([settings.DROPBOX_UPLOADER, 'share', remote_file],
+                            stdout=subprocess.PIPE)
+    # assuming output format:  > Share link: https://db.tt/a9xJoX9X
+    shared_url = proc.stdout.read().split()[3]
+
+    # Create event for new motion video
+    dropbox_motion_video_event(shared_url)
+
+    # Remove option to download local video because it's about to be deleted
+    remove_motion_video_url(event_id)
+
+    # delete video from motion data directory
+    os.remove(filepath)

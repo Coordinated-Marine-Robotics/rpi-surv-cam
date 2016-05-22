@@ -76,24 +76,42 @@ class Event(models.Model):
 
 __EVENTCLASS_SYSTEM_NAME = 'System'
 __EVENTCLASS_MOTION_NAME = 'Motion'
+__EVENTCLASS_DROPBOX_NAME = 'Dropbox'
 
-def dropbox_motion_video_event(dropbox_url):
+def new_motion_detected_event(filename):
     motion_eventclass, _ = EventClass.objects.get_or_create(
         name=__EVENTCLASS_MOTION_NAME, visible = True)
-    Event.objects.create(
-        description="New motion video taken",
+    event = Event.objects.create(
+        description="Motion detected! A video was taken",
         event_class=motion_eventclass,
-        status=Event.EVENT_INFO[0],
+        status=Event.EVENT_WARNING[0],
+        url='/download-motion?filename=' + filename,
+        url_text="Download video")
+    return event.id
+
+def dropbox_motion_video_event(dropbox_url):
+    dropbox_eventclass, _ = EventClass.objects.get_or_create(
+        name=__EVENTCLASS_DROPBOX_NAME, visible = True)
+    Event.objects.create(
+        description="Motion video was uploaded to Dropbox",
+        event_class=dropbox_eventclass,
+        status=Event.EVENT_SUCCESS[0],
         url=dropbox_url,
         url_text="View video")
 
 def dropbox_space_limit_event(mbs_remaining):
-    system_eventclass, _ = EventClass.objects.get_or_create(
-        name=__EVENTCLASS_SYSTEM_NAME, visible = True)
+    dropbox_eventclass, _ = EventClass.objects.get_or_create(
+        name=__EVENTCLASS_DROPBOX_NAME, visible = True)
     Event.objects.create(
         description="Dropbox reaching space limit: {0} MBs remaining".format(mbs_remaining),
-        event_class=system_eventclass,
+        event_class=dropbox_eventclass,
         status=Event.EVENT_WARNING[0])
+
+def remove_motion_video_url(event_id):
+    event = Event.objects.get(id=event_id)
+    event.url = ''
+    event.url_text = ''
+    event.save()
 
 def get_recent_events():
     return Event.objects.order_by('-id')[:5]
@@ -110,3 +128,8 @@ def get_motion_events():
     motion_eventclass, _ = EventClass.objects.get_or_create(
         name=__EVENTCLASS_MOTION_NAME, visible = True)
     return Event.objects.filter(event_class = motion_eventclass).order_by('-id')
+
+def get_dropbox_events():
+    dropbox_eventclass, _ = EventClass.objects.get_or_create(
+        name=__EVENTCLASS_DROPBOX_NAME, visible = True)
+    return Event.objects.filter(event_class = dropbox_eventclass).order_by('-id')

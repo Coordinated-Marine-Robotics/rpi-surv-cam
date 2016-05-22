@@ -11,7 +11,7 @@
         {{ event.description }}
         <small>
           {% if event.url != '' %}
-            (&nbsp;<a href="{{ event.url }}">{{event.url_text}}</a>&nbsp;)
+            (&nbsp;<a href="{{ event.url }}" target="_blank">{{event.url_text}}</a>&nbsp;)&nbsp;
           {% endif %}
           {% if event.status == 0 %}
             <span class="label label-success">&nbsp;&nbsp;Success

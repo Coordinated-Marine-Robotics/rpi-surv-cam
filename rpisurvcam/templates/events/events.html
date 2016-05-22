@@ -6,6 +6,7 @@
   <li role="presentation" class="active"><a href="#home" aria-controls="all" role="tab" data-toggle="tab">All</a></li>
   <li role="presentation"><a href="#motion" aria-controls="motion" role="tab" data-toggle="tab">Motion</a></li>
   <li role="presentation"><a href="#system" aria-controls="system" role="tab" data-toggle="tab">System</a></li>
+  <li role="presentation"><a href="#dropbox" aria-controls="dropbox" role="tab" data-toggle="tab">Dropbox</a></li>
 </ul>
 
 <div class="tab-content">
@@ -17,6 +18,9 @@
   </div>
   <div role="tabpanel" class="tab-pane" id="system">
   {% include "events/events_contents.html" with events=system_events %}
+  </div>
+  <div role="tabpanel" class="tab-pane" id="dropbox">
+  {% include "events/events_contents.html" with events=dropbox_events %}
   </div>
 </div>
 {% endblock %}

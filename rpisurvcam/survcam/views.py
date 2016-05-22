@@ -134,6 +134,26 @@ def snapshot(request):
     path.basename(path.realpath(snapshot_file.name)))
     return response
 
+@login_required
+def download_motion(request):
+    if not request.GET.get('filename'):
+        # Invalid request
+        return redirect('index')
+
+    video_path = path.join(settings.MOTION_TARGET_DIR,request.GET['filename'])
+    try:
+        video_file = open(video_path, 'rb')
+        response = FileResponse(video_file);
+        response['Content-Type'] = 'mimetype/submimetype'
+        response['Content-Disposition'] = ('attachment; filename=%s' %
+        path.basename(path.realpath(video_file.name)))
+        return response
+    except:
+        # The file may have been deleted after being uploaded to Dropbox,
+        # so it's ok to redirect to index, the user will see a new event
+        # with a link to the shared Dropbox video.
+        return redirect('index')
+
 @staff_member_required
 @login_required
 @Event.register("Camera turned ON", 'System', Event.EVENT_INFO)
