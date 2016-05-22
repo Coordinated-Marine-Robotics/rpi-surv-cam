@@ -67,6 +67,14 @@ def get_camera_details(request):
         'control_url': get_camera_control_url(request)
     }
 
+def file_response(filepath):
+    f = open(filepath, 'rb')
+    response = FileResponse(f);
+    response['Content-Type'] = 'mimetype/submimetype'
+    response['Content-Disposition'] = ('attachment; filename=%s' %
+    path.basename(path.realpath(f.name)))
+    return response
+
 @login_required
 def index(request):
     stream_active = is_stream_alive(request)
@@ -127,12 +135,7 @@ def snapshot(request):
     sleep(1)
     # Read file contents and return in response
     snapshot_path = path.join(settings.MOTION_TARGET_DIR,'lastsnap.jpg')
-    snapshot_file = open(snapshot_path, 'rb')
-    response = FileResponse(snapshot_file);
-    response['Content-Type'] = 'mimetype/submimetype'
-    response['Content-Disposition'] = ('attachment; filename=%s' %
-    path.basename(path.realpath(snapshot_file.name)))
-    return response
+    return file_response(snapshot_path)
 
 @login_required
 def download_motion(request):
@@ -142,12 +145,7 @@ def download_motion(request):
 
     video_path = path.join(settings.MOTION_TARGET_DIR,request.GET['filename'])
     try:
-        video_file = open(video_path, 'rb')
-        response = FileResponse(video_file);
-        response['Content-Type'] = 'mimetype/submimetype'
-        response['Content-Disposition'] = ('attachment; filename=%s' %
-        path.basename(path.realpath(video_file.name)))
-        return response
+        return file_response(video_path)
     except:
         # The file may have been deleted after being uploaded to Dropbox,
         # so it's ok to redirect to index, the user will see a new event
