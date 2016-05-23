@@ -22,10 +22,15 @@ from events.models import Event, EventClass, get_recent_events, get_motion_event
 
 from .servotargetmanager import ServoTargetManager
 
+# Connect to the servo command queue for later usage by 'move' views
+cmd_queue_name = settings.SERVO_CMD_QUEUE
+connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+cmd_channel = connection.channel()
+cmd_channel.queue_declare(queue = cmd_queue_name)
 
-def get_camera_control_url(request):
-    return '%s:%d/panel' % \
-        (request.build_absolute_uri('/')[:-1], settings.UV4L_SERVER_PORT)
+def get_motion_control_url(request):
+    return '%s:%d/0/' % \
+        (request.build_absolute_uri('/')[:-1], settings.MOTION_CONTROL_PORT)
 
 def get_motion_stream_url(request):
     return '%s:%d/' % \
@@ -49,6 +54,16 @@ def get_motion_config_param(request, param):
     except:
         return None
 
+def try_set_motion_detection(request, active):
+    try:
+        action_url = '%s:%d/0/detection/%s' % \
+            (request.build_absolute_uri('/')[:-1],
+            settings.MOTION_CONTROL_PORT,
+            'start' if active else 'pause')
+        urllib2.urlopen(action_url).read()
+    except:
+        pass
+
 def is_stream_alive(request):
     try:
         return urllib2.urlopen(get_motion_stream_url(request),
@@ -64,7 +79,7 @@ def get_camera_details(request):
         'res_height': get_motion_config_param(request,'height'),
         'fps': get_motion_config_param(request,'framerate'),
         'last_motion': last_motion_time,
-        'control_url': get_camera_control_url(request)
+        'control_url': get_motion_control_url(request)
     }
 
 def file_response(filepath):
@@ -110,17 +125,19 @@ def move(request):
     target = request.POST['target']
     axis = request.POST['axis']
 
-    queue_name = settings.SERVO_CMD_QUEUE
-    connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host='localhost'))
-    channel = connection.channel()
-    channel.queue_declare(queue = queue_name)
-    channel.basic_publish(exchange='',
-                          routing_key=queue_name,
-                          body=(target + '@' + axis))
-    connection.close()
+    # Disable motion detection before moving the camera
+    try_set_motion_detection(request, False)
 
+    cmd_channel.basic_publish(exchange='',
+                          routing_key=cmd_queue_name,
+                          body=(target + '@' + axis))
     ServoTargetManager().set_target(axis, target)
+    
+    # Give the servos enough time to move the camera,
+    # then enable motion detection
+    sleep(2)
+    try_set_motion_detection(request, True)
+
     return JsonResponse({'target': ServoTargetManager().get_target(axis)})
 
 @login_required

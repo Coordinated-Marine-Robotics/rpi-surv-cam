@@ -16,9 +16,6 @@ MOTION_TARGET_DIR = '/home/pi/motion_data'
 # Motion software binary path
 MOTION_BIN_PATH = '/usr/bin/motion'
 
-# UV4L server port for web control interface - chosen when running uv4l
-UV4L_SERVER_PORT = 9090
-
 # Dropbox Uploader script path
 DROPBOX_UPLOADER = '/home/pi/dropbox/dropbox_uploader.sh'
 
