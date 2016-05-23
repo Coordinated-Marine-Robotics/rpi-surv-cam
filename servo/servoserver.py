@@ -5,7 +5,7 @@ import logging.handlers
 import curses
 import time
 
-from servo import maestroconnection, maestropacket
+from . import maestroconnection, maestropacket
 from control.motioncontrol import CameraMotionControl
 from control.maestroconfig import MaestroConnectionConfig
 
@@ -46,10 +46,10 @@ cm_control = CameraMotionControl(conn, config, reset=True)
 
 def callback(ch, method, properties, body):
         print(" [x] Received %r" % body)
-	data = body.split('@')
-	target = -1 * int(data[0])
-	axis = data[1]
-	cm_control.move_to_degree(axis, target)
+    data = body.split('@')
+    target = -1 * int(data[0])
+    axis = data[1]
+    cm_control.move_to_degree(axis, target)
 
 def main():
         connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
